@@ -3,7 +3,7 @@
 import { useActionState, useRef, useEffect, startTransition } from 'react';
 import { MessageSquare, Calendar, CheckSquare, Square } from 'lucide-react';
 import {
-    updateCandidateStageAction,
+    updatePipelineStageAction,
     addCandidateNoteAction,
     addFollowUpAction,
     toggleFollowUpStatusAction
@@ -17,7 +17,7 @@ type ActionResponse = {
 export const StageSelect = ({ entryId, currentStage }: { entryId: string; currentStage: string }) => {
     const [state, formAction, isPending] = useActionState(
         async (_prevState: ActionResponse, newStage: string) => {
-            return await updateCandidateStageAction(entryId, newStage);
+            return await updatePipelineStageAction(entryId, newStage);
         },
         null
     );

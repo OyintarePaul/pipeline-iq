@@ -253,7 +253,7 @@ export default async function RecruiterDashboardPage({
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 truncate">{job.client_name || job.clientName}</p>
                       </div>
                       <Link
-                        href={`/pipeline?jobId=${job.id}`}
+                        href={`/dashboard/pipeline?jobId=${job.id}`}
                         className="text-[10px] uppercase tracking-widest bg-white text-slate-700 hover:text-blue-600 hover:border-blue-300 py-1.5 px-3 rounded border border-slate-200 font-bold transition-all cursor-pointer shrink-0 shadow-2xs block"
                       >
                         Pipeline ({count}) &rarr;

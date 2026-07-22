@@ -9,22 +9,44 @@ type ActionResponse = { success: boolean; error?: string } | null;
  * 1. KANBAN BOARD: Move Candidate Stage
  * Triggered when a card is dropped into a new column.
  */
-export async function updateCandidateStageAction(entryId: string, newStage: string): Promise<ActionResponse> {
-  const supabase = await createClient()
+
+export async function updatePipelineStageAction(entryId: string, newStage: string) {
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from('pipeline_entries')
-    .update({ stage: newStage })
-    .eq('id', entryId)
+    .update({
+      stage: newStage,
+    })
+    .eq('id', entryId);
 
   if (error) {
-    console.error('Error updating stage:', error.message)
-    return { success: false, error: error.message }
+    console.error('Failed to update pipeline stage:', error.message);
+    return { success: false, error: error.message };
   }
 
-  // Instantly bust the cache for this job's pipeline page
-  revalidatePath("/dashboard")
-  return { success: true }
+  revalidatePath('/dashboard/pipeline');
+  return { success: true };
+}
+
+export async function addCandidateToPipelineAction(candidateId: string, jobId: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('pipeline_entries')
+    .insert({
+      candidate_id: candidateId,
+      job_order_id: jobId,
+      stage: 'Sourced',
+    });
+
+  if (error) {
+    console.error('Failed to add candidate to pipeline:', error.message);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath('/dashboard/pipeline');
+  return { success: true };
 }
 
 /**
@@ -92,7 +114,7 @@ export async function addFollowUpAction(pipelineEntryId: string, dueDate: string
  * Create New Job Order
  */
 export async function createJobOrderAction(
-  _prevState: ActionResponse, 
+  _prevState: ActionResponse,
   formData: FormData
 ): Promise<ActionResponse> {
   const supabase = await createClient();
@@ -137,5 +159,39 @@ export async function updateJobStatusAction(jobId: string, newStatus: string): P
   if (error) return { success: false, error: error.message };
 
   revalidatePath('/jobs');
+  return { success: true };
+}
+
+
+
+export async function createCandidateAction(
+  _prevState: ActionResponse,
+  formData: FormData
+): Promise<ActionResponse> {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: 'Unauthorized' };
+
+  const fullName = (formData.get('full_name') as string)?.trim();
+  const email = (formData.get('email') as string)?.trim();
+  const phone = (formData.get('phone') as string)?.trim() || null;
+  const resumeNotes = (formData.get('resume_notes') as string)?.trim() || null;
+
+  if (!fullName || !email) {
+    return { success: false, error: 'Full name and email address are required.' };
+  }
+
+  const { error } = await supabase.from('candidates').insert({
+    full_name: fullName,
+    email,
+    phone,
+    resume_notes: resumeNotes,
+    created_by: user.id,
+  });
+
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath('/candidates');
   return { success: true };
 }

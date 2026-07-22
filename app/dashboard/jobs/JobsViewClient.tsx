@@ -152,7 +152,7 @@ export const JobsViewClient: React.FC<JobsViewClientProps> = ({
                     <td className="p-4 text-right pr-6">
                       {/* Next.js URL navigation replacing setCurrentView */}
                       <Link
-                        href={`/pipeline?jobId=${job.id}`}
+                        href={`/dashboard/pipeline?jobId=${job.id}`}
                         className="inline-block text-[10px] uppercase tracking-widest bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 px-3.5 rounded-sm border border-blue-100 font-bold transition-all cursor-pointer"
                       >
                         View Board &rarr;
