@@ -3,15 +3,17 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
-export async function handleSignIn(email: string) {
+// const DEMO_PASSWORD = 'Harborview2026!'
+
+export async function handleSignIn(_prevState: any, formData: FormData) {
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
+
   const supabase = await createClient()
-  
-  // Use a unified demo password behind the scenes to preserve the input-free UX
-  const DEMO_PASSWORD = 'Harborview2026!'
 
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-    email: email.trim(),
-    password: DEMO_PASSWORD,
+    email,
+    password
   })
 
   if (authError) {
