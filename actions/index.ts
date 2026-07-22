@@ -32,6 +32,18 @@ export async function updatePipelineStageAction(entryId: string, newStage: strin
 export async function addCandidateToPipelineAction(candidateId: string, jobId: string) {
   const supabase = await createClient();
 
+  // 1. Check if entry already exists
+  const { data: existing } = await supabase
+    .from('pipeline_entries')
+    .select('id')
+    .eq('job_order_id', jobId)
+    .eq('candidate_id', candidateId)
+    .maybeSingle();
+
+  if (existing) {
+    return { success: false, error: 'Candidate is already in this pipeline.' };
+  }
+
   const { error } = await supabase
     .from('pipeline_entries')
     .insert({

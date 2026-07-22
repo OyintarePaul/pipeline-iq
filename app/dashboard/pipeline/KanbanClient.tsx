@@ -56,7 +56,6 @@ export function KanbanClient({
   job,
   initialEntries,
   availableCandidates,
-  selectedCandidateId
 }: KanbanClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
